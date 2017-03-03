@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DebugConsoleUtils demo</title>
+<script src="DebugConsoleUtils.js"></script>
+</head>
+<body>
+	<fieldset id="debugging_mode">
+		<legend>Debugging mode</legend>
+		ON<input type="radio" name="debug_mode" value="on" checked> OFF<input type="radio" name="debug_mode" value="off">
+	</fieldset>
+	<fieldset id="debugging_tests">
+		<legend>Log string</legend>
+		<div>
+			<p>Simulate a custom message sent to the debug console output</p>
+			Message:<input type="text" placeholder="output your string message"
+				value="Lorem ipsum dolor sit amet, consectetur adipiscing elit" size="50" id="test_message"><input type="button"
+				value="Test" id="btn_test_msg">
+		</div>
+		<div>
+			<p>Simulate a custom message sent from within a JavaScript function</p>
+			Function:<input type="text" placeholder="function name" value="my_function" id="test_function"><input type="button"
+				value="Test" id="btn_test_fct">
+		</div>
+		<div>
+			<input type="button" value="Randomize" id="btn_randomize">
+		</div>
+	</fieldset>
+	<div>
+		<input type="button" value="Start debugging" id="btn_start"> <input type="button" value="Stop debugging"
+			id="btn_stop">
+	</div>
+	<script type="text/javascript">
+        var started = false;
+        var btn_start = document.getElementById('btn_start');
+        var btn_stop = document.getElementById('btn_stop');
+        var btn_test_msg = document.getElementById('btn_test_msg');
+        var btn_test_fct = document.getElementById('btn_test_fct');
+
+        var debugging_mode = document.getElementById('debugging_mode');
+
+        var debugging_tests = document.getElementById('debugging_tests');
+        var dbg = null;
+
+        // start debugging mode
+        btn_start.addEventListener("click", function() {
+            started = true;
+            updateStatus();
+            if (!on_debug_mode()) {
+                alert("Debug-mode is OFF. Console output inhibited...");
+            }
+            dbg = new DebugConsoleUtils(on_debug_mode());
+            dbg.start();
+        });
+
+        // stop debugging mode (see finish)
+        btn_stop.addEventListener("click", function() {
+            started = false;
+            updateStatus();
+            dbg.finish();
+            if (dbg) {
+                delete dbg;
+            }
+            dbg = null;
+        });
+
+        // test sample message (see log)
+        btn_test_msg.addEventListener("click", function() {
+            dbg.log(document.getElementById('test_message').value);
+        });
+
+        // test sample function name (see log_onbegin|log_onend)
+        btn_test_fct.addEventListener("click", function() {
+            var fctname = document.getElementById('test_function').value + ')';
+            dbg.log_onbegin(fctname);
+            dbg.log(document.getElementById('test_message').value);
+            dbg.log_onend(fctname);
+        });
+
+        // run randomly generated tests
+        btn_randomize.addEventListener("click", function() {
+            var i = 0, j, fctlist = [];
+            // generate a radom function list
+            for (prop in console) {
+                if (console.hasOwnProperty(prop)) {
+                    fctlist.push(prop)
+                }
+            }
+            var fctInterval = setInterval(function() {
+                if (i >= fctlist.length) {
+                    clearInterval(fctInterval);
+                    return;
+                }
+                var fctname = fctlist[i] + ')';
+                dbg.log_onbegin(fctname);
+                for (j = 0; j < Math.max(1, 10 * Math.random()); j += 1) {
+                    dbg.log("Some sample debug message #" + j);
+                }
+                dbg.log_onend(fctname);
+
+                i += 1;
+            }, 100);
+        });
+
+        // get debug_mode state
+        function on_debug_mode() {
+            return "on" === document.querySelector('input[type=radio]:checked').value;
+        }
+
+        // sync the UI with the chosen options
+        function updateStatus() {
+            if (started) {
+                btn_start.setAttribute("disabled", "disabled");
+                btn_stop.removeAttribute("disabled");
+                debugging_mode.setAttribute("disabled", "disabled");
+                debugging_tests.removeAttribute("disabled");
+            } else {
+                btn_start.removeAttribute("disabled");
+                debugging_mode.removeAttribute("disabled");
+                btn_stop.setAttribute("disabled", "disabled");
+                debugging_tests.setAttribute("disabled", "disabled");
+            }
+        }
+
+        updateStatus();
+    </script>
+</body>
+</html>

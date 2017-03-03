@@ -47,3 +47,7 @@ outer_function();
 
 dbg.finish(); // output the end of the debugging session
 ```
+
+## Demo
+
+See the `demo` directory.

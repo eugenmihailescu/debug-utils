@@ -1,11 +1,11 @@
-# debug-utils
+# DebugConsoleUtils
 A JavaScript debugging class that provides a minimal set of functions which aid in making the JavaScript console debugging more fun.
 
 It encompases only six functions that help us to:
-- output a starting debugging session to the console
-- output an ending debuggin session to the console
+- output a starting debugging session header to the console
+- output an ending separator for the currently debugging session
 - output a string|object to the output console, optionally showing the envet's timestamp
-- output the entering and exiting into/from a function followed by an identetion of all the subsequent string outputs
+- output the entry and exiting points into/from a function; all the outputs between these two are automatically idented
 - get the current identation level
 
 ### Sample output:
